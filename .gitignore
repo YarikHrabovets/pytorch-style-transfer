@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# PyCharm
+.idea/
+.idea/*
+
+# PyTorch specific
+*.pt
+*.pth
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.*
+
+# Cache
+*.cache
+*.pkl
+*.tmp
+
+# Pydantic compiled schema cache
+__pydantic_cache__/
+
+# MyPy & Pyright
+.mypy_cache/
+.pyright/
