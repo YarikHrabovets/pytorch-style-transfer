@@ -1,26 +1,42 @@
-from utils import ImageTransformerNet
-import torch
-from utils import load_image
+from neural_style_transfer import NeuralStyleTransfer
+from tensorflow import keras
+from PIL import Image
 from io import BytesIO
-from torchvision.transforms import ToPILImage
+
+vgg = keras.applications.vgg19.VGG19(include_top=False, weights='imagenet')
+vgg.trainable = False
+
+content_layers = ['block5_conv2']
+style_layers = [
+    'block1_conv1',
+    'block2_conv1',
+    'block3_conv1',
+    'block4_conv1',
+    'block5_conv1'
+]
+
+num_content_layers = len(content_layers)
+num_style_layers = len(style_layers)
+
+style_outputs = [vgg.get_layer(name).output for name in style_layers]
+content_outputs = [vgg.get_layer(name).output for name in content_layers]
+model_outputs = style_outputs + content_outputs
+
+model = keras.models.Model(vgg.input, model_outputs)
+for layer in model.layers:
+    layer.trainable = False
 
 
-def transform_to_van_gogh_style(image: BytesIO) -> BytesIO:
-    device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
-    model = ImageTransformerNet().to(device)
-    model.load_state_dict(torch.load('./saved_models/VincentVanGogh_model.pth'))
-    model.eval()
+async def transform_to_van_gogh_style(data, progress_callback):
+    image_input = Image.open(data).convert('RGB')
+    image_style = Image.open('./styles/Vincent-van-Gogh.jpg').convert('RGB')
+    neural_transfer = NeuralStyleTransfer(image_input, image_style, model, num_style_layers, num_content_layers)
+    best_img, best_loss = await neural_transfer.process_iterations(progress_callback)
 
-    img = load_image(image, device=device)
-
-    with torch.no_grad():
-        output = model(img)
-
-    output = output.clamp(0, 255) / 255.0
-    to_pil = ToPILImage()
-    image = to_pil(output.squeeze(0))
+    image = Image.fromarray(best_img.astype('uint8'), 'RGB')
     buffer = BytesIO()
     image.save(buffer, format='JPEG')
     buffer.seek(0)
 
-    return buffer
+    return buffer.getvalue()
+

@@ -31,10 +31,9 @@ async def photo_input_handler(message: Message) -> None:
     await bot.download_file(photo.file_path, buffer)
     buffer.seek(0)
 
-    await message.answer(text='Image is uploaded. Starting transformation...')
-    result_buffer = transform_to_van_gogh_style(buffer)
-    result_buffer.seek(0)
-    file = BufferedInputFile(result_buffer.read(), filename='stylized.jpg')
+    sent = await message.answer(text='Image is uploaded. Starting transformation...')
+    result_buffer = await transform_to_van_gogh_style(buffer, lambda i, loss: send_progress(sent, i, loss))
+    file = BufferedInputFile(result_buffer, filename='stylized.jpg')
     await message.answer_photo(photo=file, caption='Image in Van Gogh style')
 
 
@@ -42,6 +41,10 @@ async def photo_input_handler(message: Message) -> None:
 async def text_input_handler(message: Message) -> None:
     answer = html.bold('Unsupported input type.\nYou should upload an image')
     await message.answer(text=answer)
+
+
+async def send_progress(sent: Message, iteration, loss) -> None:
+    await sent.edit_text(f'Iteration {iteration}/100 with loss: {loss:.2f}')
 
 
 async def main() -> None:
