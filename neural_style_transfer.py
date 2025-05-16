@@ -39,19 +39,6 @@ class NeuralStyleTransfer:
         content_features = [content_layer[0] for content_layer in self.model(self.x_img)[self.num_style_layers:]]
         return style_features, content_features
 
-    @tf.function
-    def iteration_step(self, min_vals, max_vals):
-        with tf.GradientTape() as tape:
-            all_loss = compute_loss(**self.cfg)
-
-        loss, style_score, content_score = all_loss
-        grads = tape.gradient(loss, self.init_image)
-        self.opt.apply_gradients([(grads, self.init_image)])
-        clipped = tf.clip_by_value(self.init_image, min_vals, max_vals)
-        self.init_image.assign(clipped)
-
-        return loss, style_score, content_score
-
     async def process_iterations(self, progress_callback=None):
         norm_means = np.array([103.939, 116.779, 123.68], dtype=np.float32)
         min_vals = tf.constant(-norm_means)
@@ -60,13 +47,20 @@ class NeuralStyleTransfer:
 
         with tf.device(device):
             for i in range(NeuralStyleTransfer.num_iterations):
-                loss, style_score, content_score = self.iteration_step(min_vals, max_vals)
+                with tf.GradientTape() as tape:
+                    all_loss = compute_loss(**self.cfg)
+
+                loss, style_score, content_score = all_loss
+                grads = tape.gradient(loss, self.init_image)
+                self.opt.apply_gradients([(grads, self.init_image)])
+                clipped = tf.clip_by_value(self.init_image, min_vals, max_vals)
+                self.init_image.assign(clipped)
                 if loss < self.best_loss:
                     self.best_loss = loss
                     self.best_img = deprocess_img(self.init_image.numpy())
 
                     if progress_callback:
-                        await progress_callback(i, loss)
+                        await progress_callback(i + 1, loss)
 
         return self.best_img, self.best_loss
 
