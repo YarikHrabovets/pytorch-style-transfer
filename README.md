@@ -34,8 +34,23 @@ By reimagining photos in the style of famous paintings, this project highlights 
 - [Python 3.12](https://www.python.org/)
 
 ## 🧪 Setup Instructions
-1. Run this code
-```bash
+**1. Install redis**
+
+On macOS (with Homebrew)
+```sh
+brew install redis
+```
+
+On Ubuntu/Debian
+```sh
+sudo apt update
+sudo apt install redis-server
+sudo systemctl enable redis-server.service
+sudo systemctl start redis
+```
+
+**2. Run this code**
+```sh
   git clone https://github.com/YarikHrabovets/tensorflow-style-transfer.git
   cd tensorflow-style-transfer
   python -m venv .venv
@@ -43,14 +58,16 @@ By reimagining photos in the style of famous paintings, this project highlights 
   pip install -r requirements.txt
 ```
 
-2. Create directory tmp
-3. Create file .env
+**3. Create directory tmp**
+
+**4. Create file .env**
 ```env
 BOT_TOKEN=SET YOUR TELEGRAM BOT TOKEN
 HOST=YOUR REDIS HOST
 PORT=YOUR REDIS PORT
 ```
-4. Run the bot
-```bash
+
+**5. Run the bot**
+```sh
 python main.py
 ```
