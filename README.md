@@ -39,6 +39,7 @@ By reimagining photos in the style of famous paintings, this project highlights 
 On macOS (with Homebrew)
 ```sh
 brew install redis
+redis-server
 ```
 
 On Ubuntu/Debian
