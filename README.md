@@ -33,6 +33,12 @@ By reimagining photos in the style of famous paintings, this project highlights 
 - [Redis](https://redis.io/)
 - [Python 3.12](https://www.python.org/)
 
+## 🎯 Result
+
+Before processing             |  After processing
+:-------------------------:|:-------------------------:
+![Before](https://github.com/YarikHrabovets/tensorflow-style-transfer/blob/main/sample/sticker.webp)  |  ![After](https://github.com/YarikHrabovets/tensorflow-style-transfer/blob/main/sample/photo_2025-05-21_10-58-09.jpg)
+
 ## 🧪 Setup Instructions
 **1. Install redis**
 
