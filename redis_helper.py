@@ -10,7 +10,7 @@ load_dotenv()
 r = Redis(host=getenv('HOST'), port=int(getenv('PORT')), decode_responses=True)
 
 
-async def set_callback_data(data: dict, ttl: int = 5) -> str:
+async def set_callback_data(data: dict, ttl: int = 300) -> str:
     token = uuid.uuid4().hex[:8]
     await r.set(f'cb:{token}', json.dumps(data), ex=ttl)
     await r.set(f'shadow:{token}', json.dumps(data.get('file_path')))
